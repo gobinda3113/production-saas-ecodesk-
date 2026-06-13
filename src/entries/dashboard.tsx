@@ -33,7 +33,6 @@ function PageLoader() {
 
 function Protected({ children }: { children: React.ReactNode }) {
   const { role } = useStore();
-  const location = useLocation();
   if (!role) {
     window.location.href = "/login";
     return <PageLoader />;
