@@ -37,8 +37,8 @@ export function DashboardLayout({
 }) {
   const { credits, logout, toast } = useStore();
   const navigate = useNavigate();
+  // nav is used for both sidebar and mobile bottom nav — no duplication needed
   const nav = admin ? adminNav : clientNav;
-  const mobileNav = admin ? adminNav : clientNav;
 
   const handleLogout = () => {
     logout();
@@ -152,7 +152,7 @@ export function DashboardLayout({
 
       {/* ── Mobile bottom nav ── */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-surface-lowest border-t border-outline-variant/20 grid grid-cols-5 safe-area-bottom">
-        {mobileNav.map((item) => (
+        {nav.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}

@@ -15,8 +15,19 @@ const CreateRuleBody = z.object({
   replyMessage: z.string().trim().min(5).max(500),
 });
 
+/** Shared clientId guard — returns 403 if the user is not a CLIENT */
+function requireClientId(user: { clientId: string | null }, c: Parameters<Parameters<typeof router.get>[1]>[0]) {
+  if (!user.clientId) {
+    return c.json({ error: { code: "FORBIDDEN", message: "Only client accounts can manage rules", requestId: crypto.randomUUID() } }, 403);
+  }
+  return null;
+}
+
 router.get("/", requireAuth, rateLimit(), async (c) => {
   const user = c.get("user");
+  const guard = requireClientId(user, c);
+  if (guard) return guard;
+
   const rules = await prisma.keywordRule.findMany({
     where: { clientId: user.clientId!, deletedAt: null },
     orderBy: { createdAt: "desc" },
@@ -27,6 +38,9 @@ router.get("/", requireAuth, rateLimit(), async (c) => {
 
 router.post("/", requireAuth, rateLimit("strict"), requireCsrf, async (c) => {
   const user = c.get("user");
+  const guard = requireClientId(user, c);
+  if (guard) return guard;
+
   const body = await c.req.json();
   const parsed = CreateRuleBody.safeParse(body);
   if (!parsed.success) {
@@ -39,6 +53,7 @@ router.post("/", requireAuth, rateLimit("strict"), requireCsrf, async (c) => {
       keyword: parsed.data.keyword,
       normalizedKeyword: parsed.data.keyword.toLowerCase().trim(),
       matchMode: parsed.data.matchMode,
+      platforms: parsed.data.platforms,
       replyMessage: parsed.data.replyMessage,
       applyToAllPosts: parsed.data.applyToAllPosts,
       createdById: user.userId,
@@ -50,6 +65,9 @@ router.post("/", requireAuth, rateLimit("strict"), requireCsrf, async (c) => {
 
 router.patch("/:id/toggle", requireAuth, requireCsrf, async (c) => {
   const user = c.get("user");
+  const guard = requireClientId(user, c);
+  if (guard) return guard;
+
   const { id } = c.req.param();
   const { active } = await c.req.json<{ active: boolean }>();
 
@@ -68,6 +86,9 @@ router.patch("/:id/toggle", requireAuth, requireCsrf, async (c) => {
 
 router.delete("/:id", requireAuth, requireCsrf, async (c) => {
   const user = c.get("user");
+  const guard = requireClientId(user, c);
+  if (guard) return guard;
+
   const { id } = c.req.param();
 
   const rule = await prisma.keywordRule.findFirst({
