@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { setCookie, deleteCookie } from "hono/cookie";
+import { setCookie, deleteCookie, getCookie } from "hono/cookie";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { requireAuth } from "../middleware/auth.js";
@@ -28,7 +28,7 @@ router.post("/login", rateLimit("strict"), async (c) => {
     return c.json({ error: { code: "INVALID_CREDENTIALS", message: "Invalid email or password", requestId: crypto.randomUUID() } }, 401);
   }
 
-  const { compare } = await import("bcryptjs");
+  // Use the statically imported compare — no dynamic re-import needed
   const valid = await compare(password, user.passwordHash);
   if (!valid) {
     return c.json({ error: { code: "INVALID_CREDENTIALS", message: "Invalid email or password", requestId: crypto.randomUUID() } }, 401);
@@ -66,7 +66,8 @@ router.get("/session", requireAuth, async (c) => {
 });
 
 router.post("/logout", requireAuth, async (c) => {
-  const sessionToken = c.req.header("cookie")?.match(/session_token=([^;]+)/)?.[1];
+  // Use getCookie helper instead of manually parsing the Cookie header
+  const sessionToken = getCookie(c, "session_token");
   if (sessionToken) {
     await prisma.session.deleteMany({ where: { sessionToken } });
   }
@@ -85,7 +86,9 @@ router.post("/forgot-password", rateLimit("strict"), async (c) => {
 
   const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
   if (user) {
-    const resetToken = crypto.randomUUID();
+    // Prefix reset tokens with 'reset:' so they cannot be used as login session tokens.
+    // The requireAuth middleware rejects any token starting with this prefix.
+    const resetToken = `reset:${crypto.randomUUID()}`;
     const expires = new Date(Date.now() + 60 * 60 * 1000);
     await prisma.session.create({ data: { sessionToken: resetToken, userId: user.id, expires } });
     // In production: send email with reset link containing token
@@ -97,7 +100,7 @@ router.post("/forgot-password", rateLimit("strict"), async (c) => {
 
 /* ── Reset Password ── */
 const ResetBody = z.object({
-  token: z.string().uuid(),
+  token: z.string().min(1),
   password: z.string().min(8).max(128).regex(/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)/),
 });
 router.post("/reset-password", rateLimit("strict"), async (c) => {
@@ -108,6 +111,12 @@ router.post("/reset-password", rateLimit("strict"), async (c) => {
   }
 
   const { token, password: newPassword } = parsed.data;
+
+  // Only accept tokens that carry the reset prefix
+  if (!token.startsWith("reset:")) {
+    return c.json({ error: { code: "INVALID_TOKEN", message: "Reset link is invalid or expired", requestId: crypto.randomUUID() } }, 400);
+  }
+
   const session = await prisma.session.findUnique({ where: { sessionToken: token } });
   if (!session || session.expires < new Date()) {
     return c.json({ error: { code: "INVALID_TOKEN", message: "Reset link is invalid or expired", requestId: crypto.randomUUID() } }, 400);

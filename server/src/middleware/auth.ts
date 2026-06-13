@@ -21,6 +21,11 @@ export const requireAuth = createMiddleware(async (c, next) => {
     return c.json({ error: { code: "UNAUTHORIZED", message: "No session", requestId: crypto.randomUUID() } }, 401);
   }
 
+  // Reject password-reset tokens — they must never be used as login sessions
+  if (sessionToken.startsWith("reset:")) {
+    return c.json({ error: { code: "UNAUTHORIZED", message: "No session", requestId: crypto.randomUUID() } }, 401);
+  }
+
   const session = await prisma.session.findUnique({
     where: { sessionToken },
     include: { user: { include: { userRoles: { include: { role: true } } } } },

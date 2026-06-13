@@ -23,6 +23,12 @@ const PurchaseBody = z.object({
 
 router.post("/purchase", requireAuth, rateLimit("strict"), requireCsrf, async (c) => {
   const user = c.get("user");
+
+  // Guard: only CLIENT users have a clientId; SUPER_ADMIN does not
+  if (!user.clientId) {
+    return c.json({ error: { code: "FORBIDDEN", message: "Only client accounts can purchase credits", requestId: crypto.randomUUID() } }, 403);
+  }
+
   const body = await c.req.json();
   const parsed = PurchaseBody.safeParse(body);
   if (!parsed.success) {
@@ -35,10 +41,15 @@ router.post("/purchase", requireAuth, rateLimit("strict"), requireCsrf, async (c
   const existing = await prisma.transaction.findUnique({ where: { idempotencyKey: parsed.data.idempotencyKey } });
   if (existing) return c.json(existing);
 
+  // Fetch current wallet balance to compute accurate balanceAfter for the ledger
+  const wallet = await prisma.creditWallet.findUnique({ where: { clientId: user.clientId } });
+  const currentBalance = wallet?.balance ?? 0;
+  const balanceAfter = currentBalance + plan.credits;
+
   const [transaction] = await prisma.$transaction([
     prisma.transaction.create({
       data: {
-        clientId: user.clientId!,
+        clientId: user.clientId,
         gateway: parsed.data.gateway,
         status: "COMPLETED",
         plan: parsed.data.plan,
@@ -48,16 +59,16 @@ router.post("/purchase", requireAuth, rateLimit("strict"), requireCsrf, async (c
       },
     }),
     prisma.creditWallet.upsert({
-      where: { clientId: user.clientId! },
-      create: { clientId: user.clientId!, balance: plan.credits },
+      where: { clientId: user.clientId },
+      create: { clientId: user.clientId, balance: plan.credits },
       update: { balance: { increment: plan.credits } },
     }),
     prisma.creditLedger.create({
       data: {
-        clientId: user.clientId!,
+        clientId: user.clientId,
         type: "CREDIT_PURCHASE",
         amount: plan.credits,
-        balanceAfter: 0,
+        balanceAfter,
         reason: `Purchased ${parsed.data.plan} plan`,
       },
     }),
@@ -68,8 +79,14 @@ router.post("/purchase", requireAuth, rateLimit("strict"), requireCsrf, async (c
 
 router.get("/transactions", requireAuth, rateLimit(), async (c) => {
   const user = c.get("user");
+
+  // Guard: only CLIENT users have a clientId
+  if (!user.clientId) {
+    return c.json({ error: { code: "FORBIDDEN", message: "Only client accounts can view transactions", requestId: crypto.randomUUID() } }, 403);
+  }
+
   const transactions = await prisma.transaction.findMany({
-    where: { clientId: user.clientId! },
+    where: { clientId: user.clientId },
     orderBy: { createdAt: "desc" },
     take: 50,
   });
