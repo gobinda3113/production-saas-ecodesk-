@@ -230,6 +230,7 @@ model KeywordRule {
   keyword             String
   normalizedKeyword   String
   matchMode           MatchMode
+  platforms           Platform[]
   replyMessage        String
   active              Boolean        @default(true)
   applyToAllPosts     Boolean        @default(true)

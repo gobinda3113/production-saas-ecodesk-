@@ -77,6 +77,15 @@ router.post("/purchase", requireAuth, rateLimit("strict"), requireCsrf, async (c
   return c.json(transaction, 201);
 });
 
+router.get("/balance", requireAuth, rateLimit(), async (c) => {
+  const user = c.get("user");
+  if (!user.clientId) {
+    return c.json({ error: { code: "FORBIDDEN", message: "Only client accounts can view balance", requestId: crypto.randomUUID() } }, 403);
+  }
+  const wallet = await prisma.creditWallet.findUnique({ where: { clientId: user.clientId } });
+  return c.json({ balance: wallet?.balance ?? 0 });
+});
+
 router.get("/transactions", requireAuth, rateLimit(), async (c) => {
   const user = c.get("user");
 
