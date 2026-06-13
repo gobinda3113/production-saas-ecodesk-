@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useStore } from "@/store";
 import { Icon, Button, Card } from "@/components/ui";
 
 export default function ResetPassword() {
   const { toast } = useStore();
-  const [searchParams] = useSearchParams();
+  const searchParams = new URLSearchParams(window.location.search);
   const token = searchParams.get("token") || "";
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");

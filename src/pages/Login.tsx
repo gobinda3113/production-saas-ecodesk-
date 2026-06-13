@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useStore } from "@/store";
 import { Icon, Button, Card } from "@/components/ui";
@@ -7,7 +6,7 @@ import { cn } from "@/utils/cn";
 
 export default function Login({ admin = false }: { admin?: boolean }) {
   const { login, toast } = useStore();
-  const [searchParams] = useSearchParams();
+  const searchParams = new URLSearchParams(window.location.search);
   const [email, setEmail] = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
