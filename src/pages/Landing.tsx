@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { Icon, Button, Card, Badge } from "@/components/ui";
 import { PLANS, PLATFORM_META } from "@/data/mock";
 import { cn } from "@/utils/cn";
-import mockupImg from "../../public/images/dashboard-mockup.png";
+const mockupImg = "/images/dashboard-mockup.png";
 
 function useReveal() {
   useEffect(() => {
