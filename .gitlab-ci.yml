@@ -1,0 +1,71 @@
+image: node:22-alpine
+
+stages:
+  - lint
+  - test
+  - build
+
+variables:
+  POSTGRES_DB: echodesk
+  POSTGRES_USER: echodesk
+  POSTGRES_PASSWORD: echodesk
+  DATABASE_URL: "postgresql://echodesk:echodesk@postgres:5432/echodesk?schema=public"
+  REDIS_URL: "redis://redis:6379"
+  SESSION_SECRET: "ci-session-secret-at-least-32-characters-long"
+  CSRF_SECRET: "ci-csrf-secret-at-least-32-characters-long"
+  NODE_ENV: "test"
+
+services:
+  - name: postgres:16-alpine
+    alias: postgres
+  - name: redis:7-alpine
+    alias: redis
+
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - node_modules/
+
+before_script:
+  - npm ci
+  - npx prisma generate
+
+lint:
+  stage: lint
+  script:
+    - npx tsc --noEmit
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "master"'
+
+test:
+  stage: test
+  script:
+    - npm run test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "master"'
+
+build-frontend:
+  stage: build
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 hour
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+
+build-server:
+  stage: build
+  script:
+    - npm run build:server
+  artifacts:
+    paths:
+      - server/dist/
+    expire_in: 1 hour
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'

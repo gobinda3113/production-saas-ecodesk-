@@ -31,12 +31,8 @@ export default function ResetPassword() {
     }
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
-      });
-      if (!res.ok) throw new Error();
+      const { api } = await import("@/lib/api");
+      await api.auth.resetPassword({ token, password });
       setDone(true);
       setTimeout(() => navigate("/login"), 2000);
     } catch {

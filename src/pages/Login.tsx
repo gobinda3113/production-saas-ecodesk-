@@ -17,7 +17,7 @@ export default function Login({ admin = false }: { admin?: boolean }) {
 
   const [oauthLoading, setOauthLoading] = useState<string | null>(null);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs: typeof errors = {};
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = "Enter a valid email address.";
@@ -26,22 +26,28 @@ export default function Login({ admin = false }: { admin?: boolean }) {
     if (Object.keys(errs).length) return;
 
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      login(admin ? "admin" : "client");
+    try {
+      const { api } = await import("@/lib/api");
+      const data = await api.auth.login({ email, password });
+      const role = data.user.role === "SUPER_ADMIN" ? "admin" : "client";
+      login(role);
       toast({ type: "success", title: "Welcome back!", desc: "Redirecting to your console…" });
-      navigate(admin ? "/admin" : "/dashboard");
-    }, 900);
+      navigate(role === "admin" ? "/admin" : "/dashboard");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Login failed. Please try again.";
+      setErrors({ password: msg });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const oauthLogin = (provider: string) => {
     setOauthLoading(provider);
+    // OAuth providers not yet integrated — show info toast
     setTimeout(() => {
       setOauthLoading(null);
-      login(admin ? "admin" : "client");
-      toast({ type: "success", title: `Signed in with ${provider}`, desc: "Redirecting to your console…" });
-      navigate(admin ? "/admin" : "/dashboard");
-    }, 1200);
+      toast({ type: "info", title: `${provider} OAuth coming soon`, desc: "Please use email and password for now." });
+    }, 800);
   };
 
   return (

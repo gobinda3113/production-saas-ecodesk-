@@ -129,4 +129,19 @@ router.post("/reset-password", rateLimit("strict"), async (c) => {
   return c.json({ success: true });
 });
 
+/* ── CSRF Token ── */
+router.get("/csrf", async (c) => {
+  const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
+  const { setCookie } = await import("hono/cookie");
+  setCookie(c, "csrf_token", token, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Lax",
+    path: "/",
+    maxAge: 60 * 60,
+  });
+  return c.json({ csrfToken: token });
+});
+
 export default router;
+

@@ -18,11 +18,8 @@ export default function ForgotPassword() {
     }
     setLoading(true);
     try {
-      await fetch("/api/auth/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const { api } = await import("@/lib/api");
+      await api.auth.forgotPassword({ email });
       setSent(true);
     } catch {
       toast({ type: "error", title: "Something went wrong", desc: "Please try again later." });

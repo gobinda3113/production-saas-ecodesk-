@@ -107,7 +107,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const setTheme = useCallback((t: Theme) => setThemeState(t), []);
   const login = useCallback((r: Role) => setRole(r), []);
-  const logout = useCallback(() => setRole(null), []);
+  const logout = useCallback(() => {
+    setRole(null);
+    import("@/lib/api").then(({ clearCsrfToken }) => clearCsrfToken()).catch(() => {});
+  }, []);
 
   const toast = useCallback((t: Omit<ToastMsg, "id">) => {
     const id = crypto.randomUUID();
