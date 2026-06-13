@@ -44,7 +44,24 @@ const app = new Hono();
 
 app.use("*", cors({ origin: process.env.CORS_ORIGIN || "http://localhost:5173", credentials: true }));
 app.use("*", logger());
-app.use("*", secureHeaders());
+app.use(
+  "*",
+  secureHeaders({
+    contentSecurityPolicy: {
+      defaultSrc: ["'self'"],
+      baseUri: ["'self'"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      scriptSrc: ["'self'", "https://plausible.io"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https://plausible.io", "https://*.sentry.io"],
+      frameAncestors: ["'none'"],
+      objectSrc: ["'none'"],
+      formAction: ["'self'"],
+      upgradeInsecureRequests: [],
+    },
+  })
+);
 
 app.onError(errorHandler);
 

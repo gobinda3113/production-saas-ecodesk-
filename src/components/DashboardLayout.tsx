@@ -116,7 +116,7 @@ export function DashboardLayout({
         {/* Topbar */}
         <header className="sticky top-0 z-30 bg-surface/80 backdrop-blur-md border-b border-outline-variant/20">
           <div className="px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-3">
-            <h1 className="font-display text-lg sm:text-xl font-semibold truncate">{title}</h1>
+            <p className="font-display text-lg sm:text-xl font-semibold truncate">{title}</p>
             <div className="flex items-center gap-2 sm:gap-3">
               {!admin && (
                 <NavLink
