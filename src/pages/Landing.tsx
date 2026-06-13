@@ -320,10 +320,19 @@ export default function Landing() {
             <Link to="/help" className="hover:text-primary">Help Center</Link>
           </nav>
           <div className="flex gap-3">
-            {["public", "mail", "chat"].map((i) => (
-              <span key={i} className="w-10 h-10 rounded-full bg-surface-high flex items-center justify-center text-secondary hover:text-primary transition-standard cursor-pointer">
+            {([
+              ["public", "Website"],
+              ["mail", "Email us"],
+              ["chat", "Live chat"],
+            ] as const).map(([i, label]) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={label}
+                className="w-10 h-10 rounded-full bg-surface-high flex items-center justify-center text-secondary hover:text-primary transition-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-container"
+              >
                 <Icon name={i} className="text-[18px]" />
-              </span>
+              </button>
             ))}
           </div>
         </div>
