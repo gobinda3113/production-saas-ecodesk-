@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Icon, Card, Button } from "@/components/ui";
 
@@ -21,12 +20,12 @@ export default function HelpCenter() {
     <div className="min-h-screen bg-surface">
       <header className="border-b border-outline-variant/10 py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
-          <Link to="/" className="flex items-center gap-2">
+          <a href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center">
               <Icon name="graphic_eq" className="text-white text-[18px]" />
             </div>
             <span className="font-display text-xl text-primary font-extrabold">EchoDesk</span>
-          </Link>
+          </a>
         </div>
       </header>
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12">

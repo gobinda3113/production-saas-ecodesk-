@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useStore } from "@/store";
 import { Icon, Button, Card } from "@/components/ui";
 
 export default function ResetPassword() {
   const { toast } = useStore();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") || "";
   const [password, setPassword] = useState("");
@@ -38,7 +37,7 @@ export default function ResetPassword() {
       });
       if (!res.ok) throw new Error();
       setDone(true);
-      setTimeout(() => navigate("/login"), 2000);
+      setTimeout(() => { window.location.href = "/login"; }, 2000);
     } catch {
       toast({ type: "error", title: "Reset failed", desc: "This link may have expired. Request a new one." });
     } finally {
@@ -55,12 +54,12 @@ export default function ResetPassword() {
       <div className="min-h-screen bg-[#F7F6F3] dark:bg-surface flex items-center justify-center p-4">
         <div className="w-full max-w-md animate-slide-up">
           <div className="text-center mb-8">
-            <Link to="/" className="inline-flex items-center gap-2.5">
+            <a href="/" className="inline-flex items-center gap-2.5">
               <div className="w-11 h-11 rounded-xl bg-primary-container flex items-center justify-center">
                 <Icon name="graphic_eq" className="text-white text-[24px]" />
               </div>
               <span className="font-display text-2xl font-extrabold text-primary tracking-tight">EchoDesk</span>
-            </Link>
+            </a>
           </div>
 
           <Card className="p-8 transition-standard">

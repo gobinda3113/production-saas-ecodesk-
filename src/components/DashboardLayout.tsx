@@ -43,7 +43,7 @@ export function DashboardLayout({
   const handleLogout = () => {
     logout();
     toast({ type: "info", title: "Logged out", desc: "See you soon!" });
-    navigate("/");
+    setTimeout(() => { window.location.href = "/"; }, 300);
   };
 
   return (
