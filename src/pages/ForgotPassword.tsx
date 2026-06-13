@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useStore } from "@/store";
 import { Icon, Button, Card } from "@/components/ui";
@@ -37,12 +36,12 @@ export default function ForgotPassword() {
       <div className="min-h-screen bg-[#F7F6F3] dark:bg-surface flex items-center justify-center p-4">
         <div className="w-full max-w-md animate-slide-up">
           <div className="text-center mb-8">
-            <Link to="/" className="inline-flex items-center gap-2.5">
+            <a href="/" className="inline-flex items-center gap-2.5">
               <div className="w-11 h-11 rounded-xl bg-primary-container flex items-center justify-center">
                 <Icon name="graphic_eq" className="text-white text-[24px]" />
               </div>
               <span className="font-display text-2xl font-extrabold text-primary tracking-tight">EchoDesk</span>
-            </Link>
+            </a>
           </div>
 
           <Card className="p-8 transition-standard">
@@ -55,10 +54,10 @@ export default function ForgotPassword() {
                 <p className="text-secondary text-sm mt-2">
                   If an account exists for <span className="font-semibold text-on-background">{email}</span>, we've sent a password reset link.
                 </p>
-                <Link to="/login" className="inline-flex items-center gap-1 text-primary font-semibold text-sm mt-6 group">
+                <a href="/login" className="inline-flex items-center gap-1 text-primary font-semibold text-sm mt-6 group">
                   <Icon name="arrow_back" className="text-[16px] group-hover:-translate-x-1 transition-standard" />
                   Back to login
-                </Link>
+                </a>
               </div>
             ) : (
               <>
@@ -83,9 +82,9 @@ export default function ForgotPassword() {
                   </Button>
                 </form>
                 <div className="text-center mt-4">
-                  <Link to="/login" className="text-primary font-semibold text-sm hover:underline">
+                  <a href="/login" className="text-primary font-semibold text-sm hover:underline">
                     Back to login
-                  </Link>
+                  </a>
                 </div>
               </>
             )}

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Icon, Button, Card, Badge } from "@/components/ui";
 import { PLANS, PLATFORM_META } from "@/data/mock";
@@ -70,12 +69,12 @@ function Nav() {
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
+        <a href="/" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center">
             <Icon name="graphic_eq" className="text-white text-[18px]" />
           </div>
           <span className="font-display text-xl text-primary font-extrabold">EchoDesk</span>
-        </Link>
+        </a>
         <nav className="hidden md:flex items-center gap-8">
           {links.map(([l, h]) => (
             <a key={l} href={h} className="text-secondary hover:text-primary transition-standard text-sm font-medium">
@@ -84,12 +83,12 @@ function Nav() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-3">
-          <Link to="/login" className="text-secondary hover:text-primary font-medium text-sm px-3 py-2">
+          <a href="/login" className="text-secondary hover:text-primary font-medium text-sm px-3 py-2">
             Login
-          </Link>
-          <Link to="/login">
+          </a>
+          <a href="/login">
             <Button>Start Free Trial</Button>
-          </Link>
+          </a>
         </div>
         <button className="md:hidden p-2" onClick={() => setOpen((o) => !o)} aria-label="Menu">
           <Icon name={open ? "close" : "menu"} className="text-[26px]" />
@@ -102,10 +101,10 @@ function Nav() {
               {l}
             </a>
           ))}
-          <Link to="/login" className="text-secondary font-medium">Login</Link>
-          <Link to="/login">
+          <a href="/login" className="text-secondary font-medium">Login</a>
+          <a href="/login">
             <Button className="w-full">Start Free Trial</Button>
-          </Link>
+          </a>
         </div>
       )}
     </header>
@@ -140,11 +139,11 @@ export default function Landing() {
             TikTok messages — automatically, every time.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
-            <Link to="/login">
+            <a href="/login">
               <Button iconRight="arrow_forward" className="text-base px-7 py-3">
                 Start Free Trial
               </Button>
-            </Link>
+            </a>
             <Button variant="outline" icon="play_circle" className="text-base px-7 py-3" onClick={() => { const el = document.getElementById("how"); if (el) el.scrollIntoView({ behavior: "smooth" }); }}>
               Watch Demo
             </Button>
@@ -270,11 +269,11 @@ export default function Landing() {
                     </li>
                   ))}
                 </ul>
-                <Link to="/login" className="mt-6">
+                <a href="/login" className="mt-6">
                   <Button variant={p.popular ? "gold" : "outline"} className="w-full">
                     {p.price === 0 ? "Start Free" : "Choose Plan"}
                   </Button>
-                </Link>
+                </a>
               </Card>
             ))}
           </div>
@@ -315,9 +314,9 @@ export default function Landing() {
             <p className="text-secondary text-sm mt-2">Proudly serving Nepali Merchants.</p>
           </div>
           <nav aria-label="Footer navigation" className="flex items-center gap-6 text-sm text-secondary">
-            <Link to="/privacy" className="hover:text-primary">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-primary">Terms of Service</Link>
-            <Link to="/help" className="hover:text-primary">Help Center</Link>
+            <a href="/privacy" className="hover:text-primary">Privacy Policy</a>
+            <a href="/terms" className="hover:text-primary">Terms of Service</a>
+            <a href="/help" className="hover:text-primary">Help Center</a>
           </nav>
           <div className="flex gap-3">
             {([

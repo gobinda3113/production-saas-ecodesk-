@@ -1,5 +1,5 @@
 import { type ReactNode } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useStore } from "@/store";
 import { Icon } from "@/components/ui";
 import { cn } from "@/utils/cn";
@@ -36,14 +36,13 @@ export function DashboardLayout({
   admin?: boolean;
 }) {
   const { credits, logout, toast } = useStore();
-  const navigate = useNavigate();
   // nav is used for both sidebar and mobile bottom nav — no duplication needed
   const nav = admin ? adminNav : clientNav;
 
   const handleLogout = () => {
     logout();
     toast({ type: "info", title: "Logged out", desc: "See you soon!" });
-    navigate("/");
+    setTimeout(() => { window.location.href = "/"; }, 300);
   };
 
   return (

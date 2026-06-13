@@ -65,6 +65,8 @@ interface Store {
 
 const Ctx = createContext<Store | null>(null);
 
+const STORAGE_KEY = "echodesk-store";
+
 function loadTheme(): Theme {
   try {
     const saved = localStorage.getItem("echodesk-theme");
@@ -73,18 +75,55 @@ function loadTheme(): Theme {
   return "light";
 }
 
+function loadPersisted(): {
+  role: Role | null;
+  credits: number;
+  plan: string;
+  rules: KeywordRule[];
+  connections: Connection[];
+  transactions: Transaction[];
+} | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (data && typeof data === "object" && "role" in data) return data;
+  } catch {}
+  return null;
+}
+
+function savePersisted(state: {
+  role: Role | null;
+  credits: number;
+  plan: string;
+  rules: KeywordRule[];
+  connections: Connection[];
+  transactions: Transaction[];
+}) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {}
+}
+
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [role, setRole] = useState<Role | null>(null);
+  const persisted = loadPersisted();
+
+  const [role, setRole] = useState<Role | null>(persisted?.role ?? null);
   const [theme, setThemeState] = useState<Theme>(loadTheme);
   const [isDark, setIsDark] = useState(false);
   const [toasts, setToasts] = useState<ToastMsg[]>([]);
 
-  const [credits, setCredits] = useState(87);
-  const [plan, setPlan] = useState("Starter");
-  const [rules, setRules] = useState<KeywordRule[]>(seedRules);
+  const [credits, setCredits] = useState(persisted?.credits ?? 87);
+  const [plan, setPlan] = useState(persisted?.plan ?? "Starter");
+  const [rules, setRules] = useState<KeywordRule[]>(persisted?.rules ?? seedRules);
   const [activity, setActivity] = useState<ActivityItem[]>(seedActivity);
-  const [connections, setConnections] = useState<Connection[]>(seedConnections);
-  const [transactions, setTransactions] = useState<Transaction[]>(seedTransactions);
+  const [connections, setConnections] = useState<Connection[]>(persisted?.connections ?? seedConnections);
+  const [transactions, setTransactions] = useState<Transaction[]>(persisted?.transactions ?? seedTransactions);
+
+  // Persist critical state to localStorage on every change
+  useEffect(() => {
+    savePersisted({ role, credits, plan, rules, connections, transactions });
+  }, [role, credits, plan, rules, connections, transactions]);
 
   // theme application
   useEffect(() => {
