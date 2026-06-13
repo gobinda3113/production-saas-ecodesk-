@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Icon, Button } from "@/components/ui";
 
@@ -16,9 +17,9 @@ export default function NotFound() {
         <h1 className="font-display text-5xl font-extrabold text-primary mt-6">404</h1>
         <p className="font-display text-xl font-semibold mt-2">Page not found</p>
         <p className="text-secondary text-sm mt-2">The page you're looking for doesn't exist or has been moved.</p>
-        <a href="/" className="mt-8 inline-block">
+        <Link to="/" className="mt-8 inline-block">
           <Button icon="arrow_back">Back to Home</Button>
-        </a>
+        </Link>
       </div>
     </div>
     </>

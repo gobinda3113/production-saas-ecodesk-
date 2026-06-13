@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useStore } from "@/store";
 import { Icon, Button, Card } from "@/components/ui";
@@ -6,7 +7,8 @@ import { cn } from "@/utils/cn";
 
 export default function Login({ admin = false }: { admin?: boolean }) {
   const { login, toast } = useStore();
-  const searchParams = new URLSearchParams(window.location.search);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
@@ -58,12 +60,12 @@ export default function Login({ admin = false }: { admin?: boolean }) {
       <div className="w-full max-w-md animate-slide-up">
         {/* Logo */}
         <div className="text-center mb-8">
-          <a href="/" className="inline-flex items-center gap-2.5">
+          <Link to="/" className="inline-flex items-center gap-2.5">
             <div className="w-11 h-11 rounded-xl bg-primary-container flex items-center justify-center">
               <Icon name="graphic_eq" className="text-white text-[24px]" />
             </div>
             <span className="font-display text-2xl font-extrabold text-primary tracking-tight">EchoDesk</span>
-          </a>
+          </Link>
           <p className="text-secondary opacity-70 mt-2 text-sm">Nepal's Premium Merchant Hub</p>
         </div>
 
@@ -115,7 +117,7 @@ export default function Login({ admin = false }: { admin?: boolean }) {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label htmlFor="password" className="block text-sm font-medium">Password</label>
-                <a href="/forgot-password" className="text-primary text-[13px] hover:underline">Forgot password?</a>
+                <Link to="/forgot-password" className="text-primary text-[13px] hover:underline">Forgot password?</Link>
               </div>
               <div className="relative">
                 <input
@@ -151,16 +153,16 @@ export default function Login({ admin = false }: { admin?: boolean }) {
           {!admin ? (
             <>
               <p className="text-secondary text-sm">Don't have an account? Contact your admin.</p>
-              <a href="/admin/login" className="inline-flex items-center gap-1 text-primary font-semibold text-sm group">
+              <Link to="/admin/login" className="inline-flex items-center gap-1 text-primary font-semibold text-sm group">
                 Admin login
                 <Icon name="arrow_forward" className="text-[16px] group-hover:translate-x-1 transition-standard" />
-              </a>
+              </Link>
             </>
           ) : (
-            <a href="/login" className="inline-flex items-center gap-1 text-primary font-semibold text-sm group">
+            <Link to="/login" className="inline-flex items-center gap-1 text-primary font-semibold text-sm group">
               <Icon name="arrow_back" className="text-[16px] group-hover:-translate-x-1 transition-standard" />
               Merchant login
-            </a>
+            </Link>
           )}
           <p className="text-secondary opacity-50 text-xs pt-2">
             &copy; {new Date().getFullYear()} EchoDesk · Secure 256-bit SSL encrypted connection.
